@@ -1,0 +1,21 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: flaskrblogger-deployment
+spec:
+  selector:
+    matchLabels:
+      app: flaskrblogger
+  # replicas: 2 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: flaskrblogger
+    spec:
+      containers:
+        - name: flaskrblogger
+          image: localhost:32000/flaskrblogger:mycicd
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 5000
+        

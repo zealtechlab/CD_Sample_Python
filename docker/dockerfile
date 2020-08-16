@@ -1,0 +1,17 @@
+FROM python:3.8
+
+WORKDIR /app
+
+# ADD http://nexus:8081/repository/CI_Sample_Python/packages/flaskr/1.0.0/flaskr-1.0.0.tar.gz .
+ADD http://localhost:28081/repository/CI_Sample_Python/packages/flaskr/1.0.0/flaskr-1.0.0.tar.gz flaskr-1.0.0.tar.gz
+RUN pip3 install flaskr-1.0.0.tar.gz
+
+EXPOSE 5000
+
+ENV FLASK_APP=flaskr 
+ENV FLASK_ENV=development
+
+RUN flask init-db
+
+# ENTRYPOINT []
+CMD ["flask", "run", "--host=0.0.0.0"]

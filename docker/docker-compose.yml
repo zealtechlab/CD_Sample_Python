@@ -1,0 +1,18 @@
+version: '3'
+
+networks:
+  docker_devops_stack_cicdnetwork:
+    external: true
+
+services:
+  flaskrblogger:
+    build: .
+    container_name: flaskrblogger
+    hostname: flaskrblogger
+    image: flaskrblogger:mycicd
+    ports:
+      - "35000:5000"
+    networks:
+      docker_devops_stack_cicdnetwork:
+        aliases:
+          - flaskrblogger
