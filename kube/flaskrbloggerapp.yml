@@ -12,6 +12,8 @@ spec:
       labels:
         app: flaskrblogger
     spec:
+      selector:
+        role: app
       containers:
         - name: flaskrblogger
           image: localhost:32000/flaskrblogger:mycicd
