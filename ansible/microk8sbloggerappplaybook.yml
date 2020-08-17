@@ -94,6 +94,9 @@
         url: "http://{{ microk8s_service['stdout_lines'][1].split()[3] }}:{{ microk8s_service['stdout_lines'][1].split()[4].split(':')[0] }}"
         return_content: true
       register: flaskrblogger_response
+      until: _result.status == 200
+      retries: 10 # 720 * 5 seconds = 1hour (60*60/5)
+      delay: 5 # Every 5 seconds
       failed_when: "'Flaskr' not in  flaskrblogger_response.content"
     - debug:
         msg: "Testing URL flaskrblogger Requested: {{flaskrblogger_response.content}} Status: {{flaskrblogger_response.status}}"
