@@ -1,6 +1,6 @@
 # CD_Sample_Python
 
-This Repo demonstrates Containerisation and automated infrastructure provisionings for the Continuous Deliver/Deployment.
+This Repo demonstrates Containerisation and automated infrastructure provisionings for the Continuous Deliver/Deployment. Include Ansible Play book based deployment.
 
 **Objective**: Write and run an Ansible playbook which will install Docker, Minikube and kubectl and then create a deployment in minikube with an app running.
 
@@ -23,3 +23,11 @@ minikube start
 ```
 
 Refer kube folder
+
+## Ansible playbook
+
+```bash
+ansible --version
+
+ansible-playbook ansible/playbook.yml 
+```

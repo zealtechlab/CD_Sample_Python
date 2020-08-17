@@ -1,0 +1,115 @@
+---
+- hosts: targets
+  gather_facts: false
+  
+  #Variables
+  vars:
+    ansible_python_interpreter: '{{ ansible_playbook_python }}'
+    image_name: nginx
+    image_tag: alpine
+    replicas: 2
+    k8s_kubeconfig: '.kubeconfig'
+    
+  # Pre-Tasks to validate if microk8s is running
+  pre_tasks:
+    - name: Check Microk8s's status.
+      command: microk8s status
+      register: microk8s_status
+      changed_when: false
+      ignore_errors: true
+    # Otherwise will start microk8s
+    - name: Start microk8s if it's not running.
+      command: microk8s start
+      when: "not microk8s_status.stdout or 'Running' not in microk8s_status.stdout"
+    # Capture microk8s config
+    - name: Get microk8s config.
+      shell: |
+        microk8s config | tee {{ k8s_kubeconfig }}
+      changed_when: false
+  
+  # Check existing images
+  tasks:
+    - name: Get existing image hash.
+      shell: |
+        eval $(microk8s ctr image ls | grep {{ image_name }}:{{ image_tag }})
+        docker images -q {{ image_name }}:{{ image_tag }}
+      register: image_hash
+      changed_when: false
+    # Otherwise will create an image from Dockerfile location
+    - name: Build image if it's not already built.
+      shell: |
+        docker build -t {{ image_name }}:{{ image_tag }}
+      when: not image_hash.stdout
+    
+    - name: Ensure default Namespace exists.
+      k8s:
+        kubeconfig: '{{ k8s_kubeconfig }}'
+        api_version: v1
+        kind: Namespace
+        name: default
+        state: present
+
+    # Create Kubernetes resources to run nginx.
+    - name: Create a Deployment for nginx.
+      k8s:
+        kubeconfig: '{{ k8s_kubeconfig }}'
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: nginx
+            namespace: default
+          spec:
+            replicas: "{{ replicas }}"
+            selector:
+              matchLabels:
+                app: nginx
+            template:
+              metadata:
+                labels:
+                  app: nginx
+              spec:
+                containers:
+                - name: nginx
+                  image: "{{ image_name }}:{{ image_tag }}"
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                  - containerPort: 8180
+    
+    # Create Kubernetes Service (DNS required)
+    - name: Create a Service for nginx.
+      k8s:
+        kubeconfig: '{{ k8s_kubeconfig }}'
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: nginx
+            namespace: default
+          spec:
+            type: LoadBalancer
+            ports:
+            - port: 8180
+              targetPort: 80
+            selector:
+              app: nginx
+
+  post_tasks:
+    # Example expose using microk8s services
+    - name: Expose nginx on the host via microk8s.
+      command: microk8s kubectl get service nginx
+      changed_when: false
+      register: microk8s_service
+    - debug:
+        msg: "nginx URL: {{ microk8s_service['stdout_lines'] }}, {{ microk8s_service['stdout_lines'][1].split()[3] }}:{{ microk8s_service['stdout_lines'][1].split()[4].split(':')[0] }}"
+
+    - name: Verify nginx is responding.
+      uri:
+        url: "http://{{ microk8s_service['stdout_lines'][1].split()[3] }}:{{ microk8s_service['stdout_lines'][1].split()[4].split(':')[0] }}"
+        return_content: true
+      register: nginx_response
+      failed_when: "'nginx' not in  nginx_response.content"
+    - debug:
+        msg: "Testing URL nginx Requested: {{nginx_response.content}} Status: {{nginx_response.status}}"

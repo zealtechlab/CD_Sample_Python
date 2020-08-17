@@ -33,7 +33,11 @@ sudo microk8s.enable registry
 
 **Note**: user group will be available up on next login.
 
-Access any service by pointing the correct CLUSTER_IP on the browser [https://]. To find Cluster ip
+To Access dashboard
+
+```microk8s dashboard-proxy``` and do not close the terminal. Use the token displayed to login to the dashboard portal.
+
+Command line options - To list all namespaces running 
 
 ```bash
 sudo microk8s.kubectl get all --all-namespaces

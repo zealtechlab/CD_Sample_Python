@@ -1,0 +1,99 @@
+---
+- hosts: targets
+  gather_facts: false
+  
+  #Variables
+  vars:
+    ansible_python_interpreter: '{{ ansible_playbook_python }}'
+    image_name: flaskrblogger
+    image_tag: mycicd
+    replicas: 2
+    k8s_kubeconfig: '.kubeconfig'
+    compose_file: ../docker/docker-compose.yml
+    kube_deploy_file: ../kube/flaskrbloggerapp.yml
+    
+  # Pre-Tasks to validate if microk8s is running
+  pre_tasks:
+    - name: Check Microk8s's status.
+      command: microk8s status
+      register: microk8s_status
+      changed_when: false
+      ignore_errors: true
+    # Otherwise will start microk8s
+    - name: Start microk8s if it's not running.
+      command: microk8s start
+      when: "not microk8s_status.stdout or 'Running' not in microk8s_status.stdout"
+    # Capture microk8s config
+    - name: Get microk8s config.
+      shell: |
+        microk8s config | tee {{ k8s_kubeconfig }}
+      changed_when: false
+  
+  # Check existing images
+  tasks:
+    - name: Get existing image hash.
+      shell: |
+        eval $(microk8s ctr image ls | grep {{ image_name }}:{{ image_tag }})
+        docker images -q {{ image_name }}:{{ image_tag }}
+      register: image_hash
+      changed_when: false
+    # Otherwise will create an image from Dockerfile location
+    - name: Build image if it's not already built.
+      shell: |
+        docker-compose -f {{ compose_file }} build
+        docker tag {{ image_name }}:{{ image_tag }} hostvars[inventory_hostname]['ansible_default_ipv4']['address']:32000/{{ image_name }}:{{ image_tag }}
+        docker push hostvars[inventory_hostname]['ansible_default_ipv4']['address']:32000/{{ image_name }}:{{ image_tag }}
+      when: not image_hash.stdout
+    
+    - name: Ensure default Namespace exists.
+      k8s:
+        kubeconfig: '{{ k8s_kubeconfig }}'
+        api_version: v1
+        kind: Namespace
+        name: default
+        state: present
+
+    # Create Kubernetes resources to run flaskrblogger.
+    - name: Create a Deployment for flaskrblogger.
+      k8s:
+        kubeconfig: '{{ k8s_kubeconfig }}'
+        api_version: v1
+        state: present
+        src: '{{ kube_deploy_file }}'
+    
+    # Create Kubernetes Service (DNS required)
+    - name: Create a Service for flaskrblogger.
+      k8s:
+        kubeconfig: '{{ k8s_kubeconfig }}'
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: flaskrblogger
+            namespace: default
+          spec:
+            type: LoadBalancer
+            ports:
+            - port: 8180
+              targetPort: 5000
+            selector:
+              app: flaskrblogger
+
+  post_tasks:
+    # Example expose using microk8s services
+    - name: Expose flaskrblogger on the host via microk8s.
+      command: microk8s kubectl get service flaskrblogger
+      changed_when: false
+      register: microk8s_service
+    - debug:
+        msg: "flaskrblogger URL: {{ microk8s_service['stdout_lines'] }}, {{ microk8s_service['stdout_lines'][1].split()[3] }}:{{ microk8s_service['stdout_lines'][1].split()[4].split(':')[0] }}"
+
+    - name: Verify flaskrblogger is responding.
+      uri:
+        url: "http://{{ microk8s_service['stdout_lines'][1].split()[3] }}:{{ microk8s_service['stdout_lines'][1].split()[4].split(':')[0] }}"
+        return_content: true
+      register: flaskrblogger_response
+      failed_when: "'Flaskr' not in  flaskrblogger_response.content"
+    - debug:
+        msg: "Testing URL flaskrblogger Requested: {{flaskrblogger_response.content}} Status: {{flaskrblogger_response.status}}"
