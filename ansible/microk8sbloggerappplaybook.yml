@@ -9,8 +9,8 @@
     image_tag: mycicd
     replicas: 2
     k8s_kubeconfig: '.kubeconfig'
-    compose_file: docker/docker-compose.yml
-    kube_deploy_file: kube/flaskrbloggerapp.yml
+    compose_file: ../docker/docker-compose.yml
+    kube_deploy_file: ../kube/flaskrbloggerapp.yml
     
   # Pre-Tasks to validate if microk8s is running
   pre_tasks:
@@ -90,9 +90,11 @@
   post_tasks:
     # Example expose using microk8s services
     - name: Expose flaskrblogger on the host via microk8s.
-      command: echo prande07 | sudo -S /snap/bin/microk8s.kubectl get service flaskrblogger
+      shell: | 
+        echo prande07 | sudo -S /snap/bin/microk8s.kubectl get service flaskrblogger
       changed_when: false
       register: microk8s_service
+      
     - debug:
         msg: "flaskrblogger URL: {{ microk8s_service['stdout_lines'] }}, {{ microk8s_service['stdout_lines'][1].split()[3] }}:{{ microk8s_service['stdout_lines'][1].split()[4].split(':')[0] }}"
 
