@@ -21,7 +21,7 @@
       ignore_errors: true
     # Otherwise will start microk8s
     - name: Start microk8s if it's not running.
-      command: /snap/bin/microk8s start
+      command: /snap/bin/microk8s.start
       when: "not microk8s_status.stdout or 'running' not in microk8s_status.stdout"
 
     - name: Check that the kube conf exists
@@ -32,7 +32,7 @@
     # Capture microk8s config, if it doesnt exist already
     - name: Get microk8s config.
       shell: |
-        /snap/bin/microk8s config | tee {{ k8s_kubeconfig }}
+        /snap/bin/microk8s.config | tee {{ k8s_kubeconfig }}
       changed_when: false
       when: not stat_result.stat.exists
   
@@ -40,7 +40,7 @@
   tasks:
     - name: Get existing image hash.
       shell: |
-        eval $(/snap/bin/microk8s ctr image ls | grep {{ image_name }}:{{ image_tag }})
+        eval $(echo prande07 | sudo -S /snap/bin/microk8s.ctr images list | grep {{ image_name }}:{{ image_tag }})
         docker images -q {{ image_name }}:{{ image_tag }}
       register: image_hash
       changed_when: false
@@ -90,7 +90,7 @@
   post_tasks:
     # Example expose using microk8s services
     - name: Expose flaskrblogger on the host via microk8s.
-      command: /snap/bin/microk8s kubectl get service flaskrblogger
+      command: echo prande07 | sudo -S /snap/bin/microk8s.kubectl get service flaskrblogger
       changed_when: false
       register: microk8s_service
     - debug:
