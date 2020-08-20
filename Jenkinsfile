@@ -57,10 +57,7 @@ pipeline {
                    sh '''
                    ansible-playbook \
                         -i hosts.ini \
-                        -e " \
-                            ansible_python_interpreter=/usr/bin/python3 \
-                            kube_deploy_file=${PWD}/kube/flaskrbloggerapp.yml \
-                            " \
+                        -e "ansible_python_interpreter=/usr/bin/python3 kube_deploy_file=${PWD}/kube/flaskrbloggerapp.yml" \
                         ansible/microk8sbloggerappplaybook.yml
                     '''
                 }
