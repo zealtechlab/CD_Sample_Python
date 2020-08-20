@@ -20,24 +20,24 @@ pipeline {
                script{
                 //    println "\n\n-- Running on machine: " + "hostname -i".execute().text
                    sh '''
-                   ip=$(hostname -i | sed "s/[0-9]*$/5/")
+                   ip=$(hostname -i | sed "s/ \(\([0-9]\{1,3\}\.\)\{1,3\}\).[0-9]*//g" | sed "s/[0-9]*$/1/")
                    echo "[targets]" >> hosts.ini
                    echo $ip " ansible_connection=ssh ansible_ssh_private_key_file=/usr/share/jenkins/ref/cd_demo" >> hosts.ini
                    cat hosts.ini
                    '''
                }
            }
-           post {
-                always {
-                    perfReport filterRegex: '', sourceDataFiles: '**/*.xml'
-                }
-                success {
-                    echo '${env.BUILD_NUMBER} ${env.BUILD_URL} Inventory Creation SUCCESS'
-                }
-                failure {
-                    echo '${env.BUILD_NUMBER} ${env.BUILD_URL} Inventory Creation FAILED'
-                }
-            }
+        //    post {
+        //         always {
+        //             perfReport filterRegex: '', sourceDataFiles: '**/*.xml'
+        //         }
+        //         success {
+        //             echo '${env.BUILD_NUMBER} ${env.BUILD_URL} Inventory Creation SUCCESS'
+        //         }
+        //         failure {
+        //             echo '${env.BUILD_NUMBER} ${env.BUILD_URL} Inventory Creation FAILED'
+        //         }
+        //     }
         }
         stage ('Deploy') {
            steps {
@@ -56,17 +56,17 @@ pipeline {
                     }
                }
            }
-           post {
-                always {
-                    perfReport filterRegex: '', sourceDataFiles: '**/*.xml'
-                }
-                success {
-                    echo '${env.BUILD_NUMBER} ${env.BUILD_URL} DEPLOY SUCCESSFUL'
-                }
-                failure {
-                    echo '${env.BUILD_NUMBER} ${env.BUILD_URL} DEPLOY FAILED'
-                }
-            }
+        //    post {
+        //         always {
+        //             perfReport filterRegex: '', sourceDataFiles: '**/*.xml'
+        //         }
+        //         success {
+        //             echo '${env.BUILD_NUMBER} ${env.BUILD_URL} DEPLOY SUCCESSFUL'
+        //         }
+        //         failure {
+        //             echo '${env.BUILD_NUMBER} ${env.BUILD_URL} DEPLOY FAILED'
+        //         }
+        //     }
         }
     }
     
