@@ -19,10 +19,12 @@ pipeline {
            steps {
                script{
                    println "\n\n-- Running on machine: " + "hostname -i".execute().text
-                   sh """ip=\$\(hostname \-i \| sed \'s\/\[0\-9\]\*\$\/5\/')"""
-                   sh "echo "[targets]" >> hosts.ini"
-                   sh "echo $ip ' ansible_connection=ssh ansible_ssh_private_key_file=/usr/share/jenkins/ref/cd_demo' >> hosts.ini"
-                   sh "cat hosts.ini"
+                   sh '''
+                   ip=$(hostname -i | sed "s/[0-9]*$/5/")
+                   echo "[targets]" >> hosts.ini
+                   echo $ip " ansible_connection=ssh ansible_ssh_private_key_file=/usr/share/jenkins/ref/cd_demo" >> hosts.ini
+                   cat hosts.ini
+                   '''
                }
            }
            post {
