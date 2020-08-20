@@ -18,7 +18,7 @@ pipeline {
         stage ('Create Inventory') {
            steps {
                script{
-                   println "\n\n-- Running on machine: " + "hostname -i".execute().text
+                //    println "\n\n-- Running on machine: " + "hostname -i".execute().text
                    sh '''
                    ip=$(hostname -i | sed "s/[0-9]*$/5/")
                    echo "[targets]" >> hosts.ini
