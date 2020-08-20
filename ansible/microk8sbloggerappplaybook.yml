@@ -15,7 +15,7 @@
   # Pre-Tasks to validate if microk8s is running
   pre_tasks:
     - name: Check Microk8s's status.
-      command: microk8s status
+      command: microk8s status --wait-ready
       register: microk8s_status
       changed_when: false
       ignore_errors: true
@@ -23,11 +23,18 @@
     - name: Start microk8s if it's not running.
       command: microk8s start
       when: "not microk8s_status.stdout or 'Running' not in microk8s_status.stdout"
-    # Capture microk8s config
+
+    - name: Check that the kube conf exists
+      stat:
+        path: '{{ k8s_kubeconfig }}'
+      register: stat_result
+      
+    # Capture microk8s config, if it doesnt exist already
     - name: Get microk8s config.
       shell: |
         microk8s config | tee {{ k8s_kubeconfig }}
       changed_when: false
+      when: not stat_result.stat.exists
   
   # Check existing images
   tasks:

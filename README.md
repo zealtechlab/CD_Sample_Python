@@ -31,3 +31,8 @@ ansible --version
 
 ansible-playbook ansible/playbook.yml 
 ```
+
+For Jenkins to be able to connect to the kube host and deploy the app, copy the kube config file from the kube host machine to the data folder of Jenkins. There are more than one way to do this. Another way is to ssh to the kube cluster master machine, issue config view command to gather the kube configs and proceed.
+
+For ssh connect to work
+```cp docker_devops_stack/jenkins/config/ssh-keys/cd-demo.pub ~/.ssh/```
