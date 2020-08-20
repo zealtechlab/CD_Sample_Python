@@ -22,7 +22,7 @@ pipeline {
                    sh '''
                    ip=$(hostname -i | cut -d ' ' -f 1 | sed "s/(([0-9]{1,3}.){1,3}).[0-9]*$//g" | sed "s/[0-9]*$/1/")
                    echo "[targets]" > hosts.ini
-                   echo $ip " ansible_connection=ssh ansible_ssh_private_key_file=/usr/share/jenkins/ref/cd_demo" >> hosts.ini
+                   echo $ip " ansible_connection=ssh ansible_user=jenkins ansible_ssh_private_key_file=/var/jenkins_home/.ssh/id_rsa" >> hosts.ini
                    cat hosts.ini
                    '''
                }
