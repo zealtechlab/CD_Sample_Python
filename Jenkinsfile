@@ -41,7 +41,8 @@ pipeline {
         }
         stage ('Deploy') {
            steps {
-               ansiblePlaybook (playbook: 'ansible/microk8sbloggerappplaybook.yml') {
+               ansiblePlaybook {
+                        playbook('ansible/microk8sbloggerappplaybook.yml')
                         inventoryPath('hosts.ini')
                         // ansibleName('1.9.4')
                         // tags('one,two')
