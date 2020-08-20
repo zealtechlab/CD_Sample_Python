@@ -53,7 +53,16 @@ pipeline {
                         //     extraVar("key1", "value1", false)
                         //     extraVar("key2", "value2", true)
                     // }
-               script{sh "ansible-playbook -i hosts.ini ansible/microk8sbloggerappplaybook.yml -e ansible_python_interpreter=/usr/bin/python3"}
+               script{
+                   sh '''
+                   source ~/anaconda3/envs/vs_code_python/bin/activate
+                   conda activate base
+                   ansible-playbook -i hosts.ini \
+                        ansible/microk8sbloggerappplaybook.yml \
+                        -e ansible_python_interpreter=/usr/bin/python3
+                    conda deactivate
+                    '''
+                }
            }
         //    post {
         //         always {
