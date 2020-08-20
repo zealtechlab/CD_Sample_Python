@@ -41,18 +41,18 @@ pipeline {
         }
         stage ('Deploy') {
            steps {
-            //    ansiblePlaybook ('ansible/microk8sbloggerappplaybook.yml') {
-            //             inventoryPath('hosts.ini')
-            //             // ansibleName('1.9.4')
-            //             // tags('one,two')
-            //             // credentialsId('credsid')
-            //             // become(true)
-            //             // becomeUser("user")
-            //             // extraVars {
-            //             //     extraVar("key1", "value1", false)
-            //             //     extraVar("key2", "value2", true)
-            //         }
-               script{sh "ansible-playbook -i ansible/inventory ansible/microk8sbloggerappplaybook.yml"}
+               ansiblePlaybook (playbook: 'ansible/microk8sbloggerappplaybook.yml') {
+                        inventoryPath('hosts.ini')
+                        // ansibleName('1.9.4')
+                        // tags('one,two')
+                        // credentialsId('credsid')
+                        // become(true)
+                        // becomeUser("user")
+                        // extraVars {
+                        //     extraVar("key1", "value1", false)
+                        //     extraVar("key2", "value2", true)
+                    }
+            //    script{sh "ansible-playbook -i hosts.ini ansible/microk8sbloggerappplaybook.yml"}
            }
         //    post {
         //         always {
