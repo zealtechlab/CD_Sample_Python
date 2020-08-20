@@ -24,6 +24,8 @@ pipeline {
                    echo "[targets]" > hosts.ini
                    echo $ip " ansible_python_interpreter=/usr/bin/python3 ansible_connection=ssh ansible_user=prabhakaran ansible_ssh_private_key_file=/var/jenkins_home/.ssh/id_rsa" >> hosts.ini
                    cat hosts.ini
+                   echo "copy config"
+                   scp ${PWD}/kube/flaskrbloggerapp.yml prabhakaran@$ip:kube/kube/flaskrbloggerapp.yml 
                    '''
                }
            }
@@ -55,9 +57,10 @@ pipeline {
                     // }
                script{
                    sh '''
+                   
                    ansible-playbook \
                         -i hosts.ini \
-                        -e "ansible_python_interpreter=/usr/bin/python3 kube_deploy_file=${PWD}/kube/flaskrbloggerapp.yml" \
+                        -e "ansible_python_interpreter=/usr/bin/python3 kube_deploy_file=kube/flaskrbloggerapp.yml" \
                         ansible/microk8sbloggerappplaybook.yml
                     '''
                 }
