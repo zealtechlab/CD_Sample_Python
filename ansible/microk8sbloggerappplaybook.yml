@@ -41,15 +41,15 @@
     - name: Get existing image hash.
       shell: |
         eval $(echo prande07 | sudo -S /snap/bin/microk8s.ctr images list | grep {{ image_name }}:{{ image_tag }})
-        docker images -q {{ image_name }}:{{ image_tag }}
+        /snap/bin/docker images -q {{ image_name }}:{{ image_tag }}
       register: image_hash
       changed_when: false
     # Otherwise will create an image from Dockerfile location
     - name: Build image if it's not already built.
       shell: |
-        docker-compose -f {{ compose_file }} build
-        docker tag {{ image_name }}:{{ image_tag }} hostvars[inventory_hostname]['ansible_default_ipv4']['address']:32000/{{ image_name }}:{{ image_tag }}
-        docker push hostvars[inventory_hostname]['ansible_default_ipv4']['address']:32000/{{ image_name }}:{{ image_tag }}
+        /snap/bin/docker-compose -f {{ compose_file }} build
+        /snap/bin/docker tag {{ image_name }}:{{ image_tag }} hostvars[inventory_hostname]['ansible_default_ipv4']['address']:32000/{{ image_name }}:{{ image_tag }}
+        /snap/bin/docker push hostvars[inventory_hostname]['ansible_default_ipv4']['address']:32000/{{ image_name }}:{{ image_tag }}
       when: not image_hash.stdout
     
     - name: Ensure default Namespace exists.
