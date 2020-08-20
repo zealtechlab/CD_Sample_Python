@@ -55,12 +55,9 @@ pipeline {
                     // }
                script{
                    sh '''
-                   source ~/anaconda3/envs/vs_code_python/bin/activate
-                   conda activate base
                    ansible-playbook -i hosts.ini \
                         ansible/microk8sbloggerappplaybook.yml \
-                        -e ansible_python_interpreter=/usr/bin/python3
-                    conda deactivate
+                        -e ansible_python_interpreter=~/anaconda3/envs/vs_code_python/bin/python3
                     '''
                 }
            }
