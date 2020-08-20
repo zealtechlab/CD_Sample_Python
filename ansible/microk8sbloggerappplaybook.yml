@@ -22,7 +22,7 @@
     # Otherwise will start microk8s
     - name: Start microk8s if it's not running.
       command: microk8s start
-      when: "not microk8s_status.stdout_lines or 'running' not in microk8s_status.stdout_lines"
+      when: "not microk8s_status.stdout or 'running' not in microk8s_status.stdout"
 
     - name: Check that the kube conf exists
       stat:
