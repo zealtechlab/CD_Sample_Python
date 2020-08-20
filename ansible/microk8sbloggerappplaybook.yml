@@ -1,6 +1,6 @@
 ---
 - hosts: targets
-  gather_facts: false
+  gather_facts: true
   
   #Variables
   vars:
