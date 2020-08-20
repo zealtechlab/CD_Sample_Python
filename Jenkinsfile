@@ -38,7 +38,7 @@ pipeline {
                     echo '${env.BUILD_NUMBER} ${env.BUILD_URL} Inventory Creation FAILED'
                 }
             }
-       }
+        }
         stage ('Deploy') {
            steps {
                script{
@@ -53,7 +53,7 @@ pipeline {
                         // extraVars {
                         //     extraVar("key1", "value1", false)
                         //     extraVar("key2", "value2", true)
-                        // }
+                    }
                }
            }
            post {
@@ -67,7 +67,7 @@ pipeline {
                     echo '${env.BUILD_NUMBER} ${env.BUILD_URL} DEPLOY FAILED'
                 }
             }
-       }
+        }
     }
     
     post {
@@ -93,5 +93,4 @@ pipeline {
             echo '${env.BUILD_NUMBER} ${env.BUILD_URL} JENKINS PIPELINE ABORTED'
         }
     }
-}
 }
