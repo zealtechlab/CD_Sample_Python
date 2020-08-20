@@ -9,8 +9,8 @@
     image_tag: mycicd
     replicas: 2
     k8s_kubeconfig: '.kubeconfig'
-    compose_file: ../docker/docker-compose.yml
-    kube_deploy_file: ../kube/flaskrbloggerapp.yml
+    compose_file: docker/docker-compose.yml
+    kube_deploy_file: kube/flaskrbloggerapp.yml
     
   # Pre-Tasks to validate if microk8s is running
   pre_tasks:
