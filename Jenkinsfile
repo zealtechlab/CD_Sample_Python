@@ -53,7 +53,7 @@ pipeline {
                         //     extraVar("key1", "value1", false)
                         //     extraVar("key2", "value2", true)
                     // }
-               script{sh "ansible-playbook -i hosts.ini ansible/microk8sbloggerappplaybook.yml"}
+               script{sh "ansible-playbook -i hosts.ini ansible/microk8sbloggerappplaybook.yml -e ansible_python_interpreter=/usr/bin/python3"}
            }
         //    post {
         //         always {
