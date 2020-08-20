@@ -25,7 +25,7 @@ pipeline {
                    echo $ip " ansible_python_interpreter=/usr/bin/python3 ansible_connection=ssh ansible_user=prabhakaran ansible_ssh_private_key_file=/var/jenkins_home/.ssh/id_rsa" >> hosts.ini
                    cat hosts.ini
                    echo "copy config"
-                   scp -i /var/jenkins_home/.ssh/id_rsa ${PWD}/kube/flaskrbloggerapp.yml prabhakaran@$ip:kube/kube/flaskrbloggerapp.yml 
+                   scp -i /var/jenkins_home/.ssh/id_rsa ${PWD}/kube/flaskrbloggerapp.yml prabhakaran@$ip:~/kube/flaskrbloggerapp.yml 
                    '''
                }
            }
