@@ -21,7 +21,7 @@ pipeline {
                 //    println "\n\n-- Running on machine: " + "hostname -i".execute().text
                    sh '''
                    ip=$(hostname -i | cut -d ' ' -f 1 | sed "s/(([0-9]{1,3}.){1,3}).[0-9]*$//g" | sed "s/[0-9]*$/1/")
-                   echo "[targets]" >> hosts.ini
+                   echo "[targets]" > hosts.ini
                    echo $ip " ansible_connection=ssh ansible_ssh_private_key_file=/usr/share/jenkins/ref/cd_demo" >> hosts.ini
                    cat hosts.ini
                    '''
@@ -41,18 +41,18 @@ pipeline {
         }
         stage ('Deploy') {
            steps {
-               ansiblePlaybook('ansible/microk8sbloggerappplaybook.yml') {
-                        inventoryPath('hosts.ini')
-                        // ansibleName('1.9.4')
-                        // tags('one,two')
-                        // credentialsId('credsid')
-                        // become(true)
-                        // becomeUser("user")
-                        // extraVars {
-                        //     extraVar("key1", "value1", false)
-                        //     extraVar("key2", "value2", true)
-                    }
-            //    script{sh "ansible-playbook -i ansible/inventory ansible/microk8sbloggerappplaybook.yml"}
+            //    ansiblePlaybook ('ansible/microk8sbloggerappplaybook.yml') {
+            //             inventoryPath('hosts.ini')
+            //             // ansibleName('1.9.4')
+            //             // tags('one,two')
+            //             // credentialsId('credsid')
+            //             // become(true)
+            //             // becomeUser("user")
+            //             // extraVars {
+            //             //     extraVar("key1", "value1", false)
+            //             //     extraVar("key2", "value2", true)
+            //         }
+               script{sh "ansible-playbook -i ansible/inventory ansible/microk8sbloggerappplaybook.yml"}
            }
         //    post {
         //         always {
