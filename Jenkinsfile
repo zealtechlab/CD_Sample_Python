@@ -3,7 +3,7 @@ pipeline {
     options {
         ansiColor('xterm')
         skipStagesAfterUnstable()
-        }
+    }
 
     stages {
         // CloneCode stage is commented as the repo is already cloned by the Jenkins pipe
@@ -93,4 +93,5 @@ pipeline {
             echo '${env.BUILD_NUMBER} ${env.BUILD_URL} JENKINS PIPELINE ABORTED'
         }
     }
+}
 }
