@@ -71,6 +71,10 @@
             ports:
             - port: 8180
               targetPort: 8180
+              protocol: TCP
+              readinessProbe:
+              httpGet:
+                path: "/"
             selector:
               app: hello-go
   post_tasks:

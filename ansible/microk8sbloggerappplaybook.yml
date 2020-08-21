@@ -84,6 +84,10 @@
             ports:
             - port: 8180
               targetPort: 5000
+              protocol: TCP
+              readinessProbe:
+              httpGet:
+                path: "/"
             selector:
               app: flaskrblogger
 
